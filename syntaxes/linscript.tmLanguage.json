@@ -6,7 +6,11 @@
       "name": "constant.numeric.hex.linscript"
     },
     {
-      "match": "\\b(Fade|Music|Sound|SetBackground|LoadScript|ExecuteScript|Movie)\\b",
+      "match": "\"[^\"]*\"",
+      "name": "string.quoted.double.linscript"
+    },
+    {
+      "match": "\\b(Voice|Speaker|WaitFrame|WaitInput|Text|Sprite|Fade|Music|Sound|SetBackground|LoadScript|ExecuteScript|Movie)\\b",
       "name": "entity.name.function.linscript"
     }
   ]

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import { linscriptFunctions } from "./linscript-functions";
-import { createCompleteFunctionRegex, findIndexesOf } from "./regex-help";
+import { createCompleteFunctionRegex, getArgumentsFromFunctionLike } from "./string-util";
 
 export function activate(context: vscode.ExtensionContext) {
   // Create a decoration type for the inline hints
@@ -12,8 +12,10 @@ export function activate(context: vscode.ExtensionContext) {
     },
   });
 
-  linscriptFunctions.forEach((functionDetails) => {
-    const updateDecorations = (editor: vscode.TextEditor) => {
+  const updateDecorations = (editor: vscode.TextEditor) => {
+    const decorations: vscode.DecorationOptions[] = [];
+
+    linscriptFunctions.forEach((functionDetails) => {
       const document = editor.document;
       const text = document.getText();
 
@@ -22,85 +24,67 @@ export function activate(context: vscode.ExtensionContext) {
         functionDetails.parameters.length
       );
 
-      const decorations: vscode.DecorationOptions[] = [];
       let match;
 
       while ((match = completeFunctionRegex.exec(text)) !== null) {
         const matchIndex = match.index;
 
-        const firstSlot = findIndexesOf("(", match[0]);
-        // Shift over one so that the hint is next to the parameter rather then the comma
-        const secondSlots = findIndexesOf(",", match[0]).map((i) => i + 1);
+        const args = getArgumentsFromFunctionLike(match[0]);
 
-        const separatorLocalMatchIndexes = [...firstSlot, ...secondSlots];
-
-        if (separatorLocalMatchIndexes.length !== functionDetails.parameters.length) {
-          throw new Error("FATAL: function parameters differ in length");
+        if (args.length !== functionDetails.parameters.length) {
+          throw new Error("FATAL: function parameters and expected args differ in length");
         }
 
-        // Indexes of either ',' or '('
-        separatorLocalMatchIndexes.forEach((stringIndex, arrayIndex) => {
-          const param = functionDetails.parameters[arrayIndex];
-          const rangePos = document.positionAt(matchIndex + stringIndex + 1); // Position for each parameter
-          const isFirstParameter = arrayIndex === 0;
+        args.forEach(([stringIndex, argValue], argIndex) => {
+          const param = functionDetails.parameters[argIndex];
+          const rangePos = document.positionAt(matchIndex + stringIndex); // Position for each parameter
+          const isFirstParameter = argIndex === 0;
+
+          let contentText;
+
+          if (param.unknown) {
+            contentText = "?=";
+          } else if (param.values && argValue in param.values) {
+            contentText = `${param.name}=${param.values[argValue]} `;
+          } else {
+            contentText = `${param.name}=`;
+          }
 
           decorations.push({
             range: new vscode.Range(rangePos, rangePos),
             renderOptions: {
               after: {
-                contentText: `${param.name}=`, // Inline hint for each parameter
+                contentText,
                 margin: isFirstParameter ? "0 0 0 0" : "0 0 0 0",
               },
             },
           });
         });
       }
-
-      // TODO: Nice to Have feature to show functions when writing them
-
-      // const incompleteFunctionRegex = createIncompleteFunctionRegex(
-      //   functionDetails.name,
-      //   functionDetails.parameters.length
-      // );
-
-      // while ((match = incompleteFunctionRegex.exec(text)) !== null) {
-      //   const matchIndex = match.index;
-      //   const rangePos = document.positionAt(matchIndex + match[0].length - 1); // Position for each parameter
-
-      //   decorations.push({
-      //     range: new vscode.Range(rangePos, rangePos),
-      //     renderOptions: {
-      //       after: {
-      //         // contentText: `${functionDetails.name}(${functionDetails.parameters.join(",")})`, // Inline hint for each parameter
-      //         contentText: `Banana`, // Inline hint for each parameter
-      //       },
-      //     },
-      //   });
-      // }
-
-      editor.setDecorations(decorationType, decorations);
-    };
-
-    // Listen for changes in the active text editor
-    vscode.window.onDidChangeActiveTextEditor((editor) => {
-      if (editor) {
-        updateDecorations(editor);
-      }
     });
 
-    // Listen for changes in the text editor
-    vscode.workspace.onDidChangeTextDocument((event) => {
-      const editor = vscode.window.activeTextEditor;
-      if (editor && event.document === editor.document) {
-        updateDecorations(editor);
-      }
-    });
+    editor.setDecorations(decorationType, decorations);
+  };
 
-    // Initial decoration update for the active editor
-    if (vscode.window.activeTextEditor) {
-      updateDecorations(vscode.window.activeTextEditor);
+  // Listen for changes in the active text editor
+  vscode.window.onDidChangeActiveTextEditor((editor) => {
+    if (editor) {
+      updateDecorations(editor);
     }
   });
+
+  // Listen for changes in the text editor
+  vscode.workspace.onDidChangeTextDocument((event) => {
+    const editor = vscode.window.activeTextEditor;
+    if (editor && event.document === editor.document) {
+      updateDecorations(editor);
+    }
+  });
+
+  // Initial decoration update for the active editor
+  if (vscode.window.activeTextEditor) {
+    updateDecorations(vscode.window.activeTextEditor);
+  }
 }
 
 export function deactivate() {}

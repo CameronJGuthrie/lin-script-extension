@@ -21,12 +21,24 @@ export function createCompleteFunctionRegex(functionName: string, numArgs: numbe
   return regexPattern;
 }
 
-export function findIndexesOf(character: string[0], str: string): number[] {
-  const indexes = [];
-  for (let index = 0; index < str.length; index++) {
-    if (str[index] === character) {
-      indexes.push(index);
-    }
+export function getArgumentsFromFunctionLike(functionLike: string) {
+  const regex = /(\w+)\(([^)]*)\)/; // Match function calls
+  const match = regex.exec(functionLike);
+
+  if (match) {
+    const params = match[2].split(",").map((param) => param.trim()); // Split parameters by comma
+    const results: [number, number][] = [];
+
+    let currentIndex = match.index + match[0].indexOf(match[2]); // Start index of parameters
+
+    params.forEach((param) => {
+      const startIndex = functionLike.indexOf(param, currentIndex); // Find the correct start index
+      results.push([startIndex, Number(param)]); // Store the start index and the parameter
+      currentIndex = startIndex + param.length; // Move to the next parameter, accounting for its length
+    });
+
+    return results;
   }
-  return indexes;
+
+  return []; // Return empty array if no match is found
 }
