@@ -1,5 +1,5 @@
-import { LinscriptFunction } from "../linscript-functions";
 import { characterIds } from "../shared/character-id";
+import { LinscriptFunction } from "../shared/types";
 
 export const voice: LinscriptFunction = {
   name: "Voice",
@@ -26,3 +26,5 @@ export const voice: LinscriptFunction = {
     },
   ],
 };
+
+export default voice;

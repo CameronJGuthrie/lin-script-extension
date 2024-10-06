@@ -1,4 +1,4 @@
-import { LinscriptFunction } from "../linscript-functions";
+import { LinscriptFunction } from "../shared/types";
 
 export const movie: LinscriptFunction = {
   name: "Movie",
@@ -6,6 +6,7 @@ export const movie: LinscriptFunction = {
     {
       name: "movieId",
       values: {
+        0: "Danganronpa Opening",
         16: "Monokuma-TV-Intro",
       },
     },

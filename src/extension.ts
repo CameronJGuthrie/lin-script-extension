@@ -1,7 +1,14 @@
 import * as vscode from "vscode";
 
-import { linscriptFunctions } from "./linscript-functions";
-import { createCompleteFunctionRegex, getArgumentsFromFunctionLike } from "./string-util";
+import setBackground from "./functions/Background";
+import { item } from "./functions/Item";
+import { movie } from "./functions/Movie";
+import { speaker } from "./functions/Speaker";
+import sprite from "./functions/Sprite";
+import voice from "./functions/Voice";
+import { createCompleteFunctionRegex, getArgumentsFromFunctionLike } from "./shared/string-util";
+
+const functions = [item, movie, setBackground, speaker, sprite, voice];
 
 export function activate(context: vscode.ExtensionContext) {
   // Create a decoration type for the inline hints
@@ -15,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
   const updateDecorations = (editor: vscode.TextEditor) => {
     const decorations: vscode.DecorationOptions[] = [];
 
-    linscriptFunctions.forEach((functionDetails) => {
+    functions.forEach((functionDetails) => {
       const document = editor.document;
       const text = document.getText();
 
@@ -35,17 +42,20 @@ export function activate(context: vscode.ExtensionContext) {
           throw new Error("FATAL: function parameters and expected args differ in length");
         }
 
-        args.forEach(([stringIndex, argValue], argIndex) => {
+        args.forEach(({ stringIndex, argValue }, argIndex) => {
           const param = functionDetails.parameters[argIndex];
           const rangePos = document.positionAt(matchIndex + stringIndex); // Position for each parameter
-          const isFirstParameter = argIndex === 0;
 
           let contentText;
 
-          if (param.unknown) {
+          if (param.handler) {
+            // contentText = `${param.name}=${param.handler(args)} `;
+            contentText = `${param.handler(args)}=`;
+          } else if (param.unknown) {
             contentText = "?=";
           } else if (param.values && argValue in param.values) {
-            contentText = `${param.name}=${param.values[argValue]} `;
+            // contentText = `${param.name}=${param.values[argValue]} `;
+            contentText = `${param.values[argValue]}=`;
           } else {
             contentText = `${param.name}=`;
           }
@@ -55,7 +65,6 @@ export function activate(context: vscode.ExtensionContext) {
             renderOptions: {
               after: {
                 contentText,
-                margin: isFirstParameter ? "0 0 0 0" : "0 0 0 0",
               },
             },
           });

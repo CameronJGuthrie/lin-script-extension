@@ -1,4 +1,4 @@
-import { LinscriptFunction } from "../linscript-functions";
+import { LinscriptFunction } from "../shared/types";
 
 export const speaker: LinscriptFunction = {
   name: "Speaker",

@@ -1,6 +1,6 @@
 import * as assert from "assert";
 
-import { createCompleteFunctionRegex, getArgumentsFromFunctionLike } from "../string-util";
+import { createCompleteFunctionRegex, getArgumentsFromFunctionLike } from "../shared/string-util";
 
 suite("Extension Test Suite", () => {
   test("Sample test", () => {

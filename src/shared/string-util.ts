@@ -21,20 +21,24 @@ export function createCompleteFunctionRegex(functionName: string, numArgs: numbe
   return regexPattern;
 }
 
+export type ArgumentMetadata = { stringIndex: number; argValue: number };
+
 export function getArgumentsFromFunctionLike(functionLike: string) {
   const regex = /(\w+)\(([^)]*)\)/; // Match function calls
   const match = regex.exec(functionLike);
 
   if (match) {
     const params = match[2].split(",").map((param) => param.trim()); // Split parameters by comma
-    const results: [number, number][] = [];
+    const results: { stringIndex: number; argValue: number }[] = [];
 
     let currentIndex = match.index + match[0].indexOf(match[2]); // Start index of parameters
 
     params.forEach((param) => {
-      const startIndex = functionLike.indexOf(param, currentIndex); // Find the correct start index
-      results.push([startIndex, Number(param)]); // Store the start index and the parameter
-      currentIndex = startIndex + param.length; // Move to the next parameter, accounting for its length
+      const startIndex = functionLike.indexOf(param, currentIndex);
+
+      results.push({ stringIndex: startIndex, argValue: Number(param) });
+
+      currentIndex = startIndex + param.length;
     });
 
     return results;
