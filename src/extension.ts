@@ -1,26 +1,106 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+import { linscriptFunctions } from "./linscript-functions";
+import { createCompleteFunctionRegex, findIndexesOf } from "./regex-help";
+
 export function activate(context: vscode.ExtensionContext) {
+  // Create a decoration type for the inline hints
+  const decorationType = vscode.window.createTextEditorDecorationType({
+    after: {
+      fontStyle: "italic",
+      color: "gray",
+    },
+  });
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "lindecompilerhelper" is now active!');
+  linscriptFunctions.forEach((functionDetails) => {
+    const updateDecorations = (editor: vscode.TextEditor) => {
+      const document = editor.document;
+      const text = document.getText();
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('lindecompilerhelper.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from LinDecompilerHelper!');
-	});
+      const completeFunctionRegex = createCompleteFunctionRegex(
+        functionDetails.name,
+        functionDetails.parameters.length
+      );
 
-	context.subscriptions.push(disposable);
+      const decorations: vscode.DecorationOptions[] = [];
+      let match;
+
+      while ((match = completeFunctionRegex.exec(text)) !== null) {
+        const matchIndex = match.index;
+
+        const firstSlot = findIndexesOf("(", match[0]);
+        // Shift over one so that the hint is next to the parameter rather then the comma
+        const secondSlots = findIndexesOf(",", match[0]).map((i) => i + 1);
+
+        const separatorLocalMatchIndexes = [...firstSlot, ...secondSlots];
+
+        if (separatorLocalMatchIndexes.length !== functionDetails.parameters.length) {
+          throw new Error("FATAL: function parameters differ in length");
+        }
+
+        // Indexes of either ',' or '('
+        separatorLocalMatchIndexes.forEach((stringIndex, arrayIndex) => {
+          const param = functionDetails.parameters[arrayIndex];
+          const rangePos = document.positionAt(matchIndex + stringIndex + 1); // Position for each parameter
+          const isFirstParameter = arrayIndex === 0;
+
+          decorations.push({
+            range: new vscode.Range(rangePos, rangePos),
+            renderOptions: {
+              after: {
+                contentText: `${param.name}=`, // Inline hint for each parameter
+                margin: isFirstParameter ? "0 0 0 0" : "0 0 0 0",
+              },
+            },
+          });
+        });
+      }
+
+      // TODO: Nice to Have feature to show functions when writing them
+
+      // const incompleteFunctionRegex = createIncompleteFunctionRegex(
+      //   functionDetails.name,
+      //   functionDetails.parameters.length
+      // );
+
+      // while ((match = incompleteFunctionRegex.exec(text)) !== null) {
+      //   const matchIndex = match.index;
+      //   const rangePos = document.positionAt(matchIndex + match[0].length - 1); // Position for each parameter
+
+      //   decorations.push({
+      //     range: new vscode.Range(rangePos, rangePos),
+      //     renderOptions: {
+      //       after: {
+      //         // contentText: `${functionDetails.name}(${functionDetails.parameters.join(",")})`, // Inline hint for each parameter
+      //         contentText: `Banana`, // Inline hint for each parameter
+      //       },
+      //     },
+      //   });
+      // }
+
+      editor.setDecorations(decorationType, decorations);
+    };
+
+    // Listen for changes in the active text editor
+    vscode.window.onDidChangeActiveTextEditor((editor) => {
+      if (editor) {
+        updateDecorations(editor);
+      }
+    });
+
+    // Listen for changes in the text editor
+    vscode.workspace.onDidChangeTextDocument((event) => {
+      const editor = vscode.window.activeTextEditor;
+      if (editor && event.document === editor.document) {
+        updateDecorations(editor);
+      }
+    });
+
+    // Initial decoration update for the active editor
+    if (vscode.window.activeTextEditor) {
+      updateDecorations(vscode.window.activeTextEditor);
+    }
+  });
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}

@@ -1,0 +1,13 @@
+{
+  "scopeName": "source.linscript",
+  "patterns": [
+    {
+      "match": "\\b0x[0-9A-Fa-f]+\\b",
+      "name": "constant.numeric.hex.linscript"
+    },
+    {
+      "match": "\\b(Fade|Music|Sound|SetBackground|LoadScript|ExecuteScript|Movie)\\b",
+      "name": "entity.name.function.linscript"
+    }
+  ]
+}

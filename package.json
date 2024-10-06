@@ -9,13 +9,33 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:linscript"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "lindecompilerhelper.helloWorld",
         "title": "Hello World"
+      }
+    ],
+    "languages": [
+      {
+        "id": "linscript",
+        "extensions": [
+          ".linscript"
+        ],
+        "aliases": [
+          "Lin Script Language"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "linscript",
+        "scopeName": "source.linscript",
+        "path": "./syntaxes/linscript.tmLanguage.json"
       }
     ]
   },
