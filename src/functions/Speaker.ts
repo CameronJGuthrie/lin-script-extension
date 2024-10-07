@@ -34,6 +34,7 @@ export const speaker: LinscriptFunction = {
         25: "Daiya Owada",
         // values 26 through 29 are all 'Makoto Naegi'
         30: "???",
+        31: "", // invisible speaker
         33: "Usami",
         34: "Monokuma Backup",
         35: "Monokuma Backup (R)",

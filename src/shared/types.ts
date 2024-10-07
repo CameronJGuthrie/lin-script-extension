@@ -1,12 +1,22 @@
 import { ArgumentMetadata } from "./string-util";
 
-type LinscriptFunctionName = "Item" | "Voice" | "Movie" | "Script" | "Sprite" | "Background" | "Speaker";
+type LinscriptFunctionName =
+  | "Background"
+  | "Interaction"
+  | "Item"
+  | "Movie"
+  | "Script"
+  | "Sound"
+  | "Speaker"
+  | "Sprite"
+  | "Voice";
 
 type LinscriptValueMap = { [key: number]: string };
 
 type LinscriptFunctionParameter = {
   name: string;
   unknown?: true;
+  unused?: true;
   values?: LinscriptValueMap;
   handler?: (args: ArgumentMetadata[]) => string;
 };

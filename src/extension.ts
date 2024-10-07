@@ -1,14 +1,16 @@
 import * as vscode from "vscode";
 
-import setBackground from "./functions/Background";
+import background from "./functions/Background";
+import { interaction } from "./functions/Interaction";
 import { item } from "./functions/Item";
 import { movie } from "./functions/Movie";
+import { sound } from "./functions/Sound";
 import { speaker } from "./functions/Speaker";
 import sprite from "./functions/Sprite";
 import voice from "./functions/Voice";
 import { createCompleteFunctionRegex, getArgumentsFromFunctionLike } from "./shared/string-util";
 
-const functions = [item, movie, setBackground, speaker, sprite, voice];
+const functions = [item, interaction, movie, background, sound, speaker, sprite, voice];
 
 export function activate(context: vscode.ExtensionContext) {
   // Create a decoration type for the inline hints
@@ -48,26 +50,45 @@ export function activate(context: vscode.ExtensionContext) {
 
           let contentText;
 
-          if (param.handler) {
-            // contentText = `${param.name}=${param.handler(args)} `;
-            contentText = `${param.handler(args)}=`;
-          } else if (param.unknown) {
-            contentText = "?=";
-          } else if (param.values && argValue in param.values) {
-            // contentText = `${param.name}=${param.values[argValue]} `;
-            contentText = `${param.values[argValue]}=`;
-          } else {
-            contentText = `${param.name}=`;
-          }
-
-          decorations.push({
-            range: new vscode.Range(rangePos, rangePos),
-            renderOptions: {
-              after: {
-                contentText,
+          if (param.unused) {
+            const endRangePos = document.positionAt(matchIndex + stringIndex + String(argValue).length); // Position for each parameter
+            decorations.push({
+              range: new vscode.Range(rangePos, endRangePos),
+              renderOptions: {
+                before: {
+                  textDecoration: "line-through", // Strike through the actual text
+                  contentText: " ", // Additional content after the text
+                  color: "gray",
+                  fontStyle: "italic",
+                },
+                after: {
+                  contentText: " ", // Additional content after the text
+                  textDecoration: "line-through", // Strikethrough effect for additional content
+                },
               },
-            },
-          });
+            });
+          } else {
+            if (param.handler) {
+              // contentText = `${param.name}=${param.handler(args)} `;
+              contentText = `${param.handler(args)}=`;
+            } else if (param.unknown) {
+              contentText = "?=";
+            } else if (param.values && argValue in param.values) {
+              // contentText = `${param.name}=${param.values[argValue]} `;
+              contentText = `${param.values[argValue]}=`;
+            } else {
+              contentText = `${param.name}=`;
+            }
+
+            decorations.push({
+              range: new vscode.Range(rangePos, rangePos),
+              renderOptions: {
+                after: {
+                  contentText,
+                },
+              },
+            });
+          }
         });
       }
     });

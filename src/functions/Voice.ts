@@ -17,12 +17,11 @@ export const voice: LinscriptFunction = {
       unknown: true,
     },
     {
-      name: "",
+      name: "soundId",
       unknown: true,
     },
     {
       name: "volume",
-      unknown: true,
     },
   ],
 };
