@@ -10,7 +10,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:linscript"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {

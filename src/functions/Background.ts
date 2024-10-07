@@ -47,7 +47,7 @@ const backgrounds = {
   237: "E-Handbook Regulation 1",
 };
 
-export const setBackground: LinscriptFunction = {
+export const background: LinscriptFunction = {
   name: "Background",
   parameters: [
     {
@@ -87,5 +87,3 @@ export const setBackground: LinscriptFunction = {
     },
   ],
 };
-
-export default setBackground;
