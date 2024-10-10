@@ -69,16 +69,26 @@ export function registerDecoration() {
               },
             });
           } else {
+            let border = undefined;
             if (param.handler) {
               // contentText = `${param.name}=${param.handler(args)} `;
               contentText = `${param.handler(args)}=`;
+              if (contentText === "expression=" || contentText === "sound=") {
+                border = "1px solid white";
+              }
             } else if (param.unknown) {
               contentText = "?=";
             } else if (param.values && argValue in param.values) {
               // contentText = `${param.name}=${param.values[argValue]} `;
               contentText = `${param.values[argValue]}=`;
+              if (contentText === "expression=" || contentText === "sound=") {
+                border = "1px solid white";
+              }
             } else {
               contentText = `${param.name}=`;
+              if (contentText === "expression=" || contentText === "sound=") {
+                border = "1px solid white";
+              }
             }
 
             decorations.push({
@@ -86,6 +96,7 @@ export function registerDecoration() {
               renderOptions: {
                 after: {
                   contentText,
+                  border,
                 },
               },
             });

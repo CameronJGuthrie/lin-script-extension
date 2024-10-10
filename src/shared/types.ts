@@ -2,6 +2,7 @@ import { ArgumentMetadata } from "./string-util";
 
 type LinscriptFunctionName =
   | "Background"
+  | "Camera"
   | "Interaction"
   | "Item"
   | "Movie"

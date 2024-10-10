@@ -10,7 +10,7 @@
       "name": "string.quoted.double.linscript"
     },
     {
-      "match": "\\b(Interaction|ScreenShake|Voice|Speaker|WaitFrame|WaitInput|Text|Sprite|Fade|Music|Sound|Background|LoadScript|ExecuteScript|Movie)\\b",
+      "match": "\\b(Dictionary|Camera|Interaction|ScreenShake|Voice|Speaker|WaitFrame|WaitInput|Text|Sprite|Fade|Music|Sound|Background|LoadScript|ExecuteScript|Movie)\\b",
       "name": "entity.name.function.linscript"
     }
   ]

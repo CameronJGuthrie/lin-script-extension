@@ -44,7 +44,8 @@ const backgrounds = {
   // 233: ? i missed this one
   234: "Gymnasium Paranioa",
   235: "E-Handbook Opening",
-  237: "E-Handbook Regulation 1",
+  237: "Sayaka Fallen Over",
+  238: "Dormitory Hall Meeting",
 };
 
 export const background: LinscriptFunction = {
@@ -58,7 +59,6 @@ export const background: LinscriptFunction = {
     },
     {
       name: "backgroundId",
-      unknown: true,
       values: backgrounds,
     },
     {

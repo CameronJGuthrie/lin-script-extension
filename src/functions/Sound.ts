@@ -8,8 +8,10 @@ export const sound: LinscriptFunction = {
       unknown: true,
     },
     {
-      name: "soundId",
+      name: "sound",
       values: {
+        26: "Realization Ping",
+        141: "Footsteps",
         219: "Metal Plate Bang Bang",
       },
     },

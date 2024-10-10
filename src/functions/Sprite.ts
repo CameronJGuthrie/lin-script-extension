@@ -24,8 +24,11 @@ export const sprite: LinscriptFunction = {
       },
     },
     {
-      name: "",
-      unknown: true,
+      name: "transitionId",
+      values: {
+        1: "None", // not sure
+        7: "ExitBottom",
+      },
     },
     {
       name: "",
@@ -40,6 +43,7 @@ const variants = {
     0: "Neutral",
     1: "Worried",
     2: "Laughing",
+    5: "Desparate",
     6: "Speaking",
     7: "Proclaim",
     8: "Proclaim Point",
@@ -103,6 +107,7 @@ const variants = {
     0: "Neutral",
     1: "Realization",
     2: "Laughing",
+    3: "Nervous",
     6: "Surprised",
     11: "Thinking",
   },
@@ -111,9 +116,10 @@ const variants = {
     0: "Neutral",
     1: "Shy",
     2: "Shy-2",
-    3: "Intense",
+    3: "Serious",
     5: "Smiling",
-    9: "Apologetic",
+    6: "Cheerful",
+    9: "Concerned",
     16: "Thinking",
   },
   // Kyoko
@@ -128,13 +134,18 @@ const variants = {
   // Hina
   9: {
     0: "Neutral",
+    1: "Speaking",
     4: "Smiling",
     5: "Laughing", // small laugh, hand behind head
+    8: "Wondering",
     9: "Horrified",
+    11: "Shocked",
+    13: "Sad",
     14: "Shouting",
     19: "Thinking",
     20: "Positive",
     21: "Determined",
+    22: "Exasperated",
   },
   // Toko
   10: {
@@ -154,6 +165,7 @@ const variants = {
     0: "Neutral",
     2: "Wise",
     5: "FacingRight",
+    6: "Conclusive",
   },
   // Celeste
   12: {
@@ -163,18 +175,23 @@ const variants = {
     3: "SweetSmile",
     4: "Disaapointed",
     5: "Surprised",
-    7: "Thinking",
+    6: "Thinking",
+    7: "Pondering",
     8: "TwirlHair",
+    15: "Intense",
   },
   // Mukuro
   13: {
     0: "Neutral",
+    1: "Neutral-2", // Slight frown
     2: "Disgusted",
     3: "Worried",
+    4: "Annoyed",
     5: "SmilePeace",
-    6: "TwirlHair",
+    6: "Casual", // Twirl hair
+    7: "Angry",
     8: "Talking",
-    9: "Shocked",
+    9: "Stunned",
   },
   // Chihiro
   14: {

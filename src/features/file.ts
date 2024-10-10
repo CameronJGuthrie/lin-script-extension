@@ -117,26 +117,62 @@ function compileWad(wadsDir: string) {
 // Function to move .wad files to the target Steam directory
 function moveWadsToSteam(sourceDir: string, targetDir: string) {
   // Find all .wad files in the source directory
-  fs.readdir(sourceDir, (err, files) => {
+  fs.readdir(sourceDir, async (err, files) => {
     if (err) {
       console.error(`Failed to read directory: ${err}`);
       return;
     }
 
-    files.forEach((file) => {
+    let movePromises = [];
+
+    for (const file of files) {
       if (file.endsWith(".wad")) {
         const sourceFilePath = path.join(sourceDir, file);
         const targetFilePath = path.join(targetDir, file);
 
+        // Check if the file is in use
+        const inUse = await isFileInUse(sourceFilePath);
+        if (inUse) {
+          // vscode.window.showWarningMessage(`Cannot move ${file}: it is currently in use.`);
+          continue; // Skip this file and move to the next one
+        }
+
         // Move the file to the target directory
-        fs.rename(sourceFilePath, targetFilePath, (err) => {
-          if (err) {
-            console.error(`Failed to move file ${file}: ${err}`);
-          } else {
-            console.log(`Moved ${file} to ${targetDir}`);
-          }
+        const movePromise = new Promise((resolve, reject) => {
+          fs.rename(sourceFilePath, targetFilePath, (err) => {
+            if (err) {
+              console.error(`Failed to move file ${file}: ${err}`);
+              reject(err);
+            } else {
+              console.log(`Moved ${file} to ${targetDir}`);
+              resolve(file); // Resolve with the moved file name
+            }
+          });
         });
+
+        movePromises.push(movePromise);
       }
-    });
+    }
+
+    // Notify when all files are moved
+    Promise.all(movePromises)
+      .then((movedFiles) => {
+        if (movedFiles.length > 0) {
+          vscode.window.showInformationMessage(`Successfully moved ${movedFiles.length} .wad files to ${targetDir}.`);
+        }
+      })
+      .catch((err) => {
+        // vscode.window.showErrorMessage(`Error moving .wad files: ${err}`);
+      });
   });
 }
+
+// Function to check if a file is in use
+const isFileInUse = (filePath: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    fs.access(filePath, fs.constants.R_OK, (err) => {
+      // If there is an error, the file might be in use or not accessible
+      resolve(!!err);
+    });
+  });
+};
